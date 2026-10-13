@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusBite - Canteen, Stationery & Printout Hub</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts Inter & Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Tone.js for Notification Audio Ping -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              200: '#fed7aa',
+              500: '#f97316',
+              600: '#ea580c',
+              700: '#c2410c',
+            },
+            accent: {
+              teal: '#0d9488',
+              violet: '#7c3aed',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    /* Pulse badge animation */
+    @keyframes subtle-pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.9; }
+    }
+    .badge-pulse {
+      animation: subtle-pulse 2s infinite ease-in-out;
+    }
+    /* Glass card backdrop */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo & Brand -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('canteen')">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 via-orange-500 to-amber-400 flex items-center justify-center text-white shadow-md shadow-brand-500/25">
+            <i data-lucide="utensils" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">CampusBite</span>
+              <span class="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-700">Hub</span>
+            </div>
+            <p class="text-[11px] text-slate-400 font-medium -mt-1">Canteen • Stationery • Xerox</p>
+          </div>
+        </div>
+
+        <!-- Desktop Navigation Tabs -->
+        <nav class="hidden md:flex items-center space-x-1 bg-slate-100/90 p-1 rounded-2xl border border-slate-200/60">
+          <button onclick="switchTab('canteen')" id="tab-btn-canteen" class="tab-btn active px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 bg-white text-orange-600 shadow-xs">
+            <i data-lucide="coffee" class="w-4 h-4"></i> Canteen Menu
+          </button>
+          <button onclick="switchTab('prebook')" id="tab-btn-prebook" class="tab-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-orange-600 transition-all duration-200 flex items-center gap-1.5">
+            <i data-lucide="clock" class="w-4 h-4"></i> Pre-Book Slot
+          </button>
+          <button onclick="switchTab('stationery')" id="tab-btn-stationery" class="tab-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-orange-600 transition-all duration-200 flex items-center gap-1.5">
+            <i data-lucide="pen-tool" class="w-4 h-4"></i> Stationery
+          </button>
+          <button onclick="switchTab('xerox')" id="tab-btn-xerox" class="tab-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-orange-600 transition-all duration-200 flex items-center gap-1.5">
+            <i data-lucide="printer" class="w-4 h-4"></i> Xerox & Printout
+          </button>
+          <button onclick="switchTab('tracker')" id="tab-btn-tracker" class="tab-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-orange-600 transition-all duration-200 flex items-center gap-1.5 relative">
+            <i data-lucide="bell-ring" class="w-4 h-4"></i> Tracker
+            <span id="tracker-indicator" class="hidden absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+          </button>
+        </nav>
+
+        <!-- Right action: Student Wallet + Cart Button -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-xl border border-slate-200/80">
+            <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">
+              ₹
+            </div>
+            <div class="text-xs">
+              <span class="text-slate-400 block text-[10px] leading-3">Campus Card</span>
+              <span class="font-bold text-slate-700" id="wallet-balance">₹480.00</span>
+            </div>
+          </div>
+
+          <!-- Cart Trigger Button -->
+          <button onclick="toggleCartDrawer(true)" class="relative p-2.5 bg-brand-50 hover:bg-brand-100 text-brand-600 rounded-2xl transition border border-brand-200 flex items-center justify-center shadow-xs">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+            <span id="cart-badge-count" class="absolute -top-1.5 -right-1.5 bg-orange-600 text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-xs">
+              0
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Nav Bar (Below main on mobile) -->
+    <div class="md:hidden flex items-center justify-around border-t border-slate-200 py-2 bg-slate-50/90 text-xs overflow-x-auto px-2">
+      <button onclick="switchTab('canteen')" id="m-tab-canteen" class="px-2 py-1 rounded-lg font-semibold text-orange-600 flex flex-col items-center">
+        <i data-lucide="coffee" class="w-4 h-4"></i>
+        <span class="text-[10px]">Canteen</span>
+      </button>
+      <button onclick="switchTab('prebook')" id="m-tab-prebook" class="px-2 py-1 rounded-lg font-semibold text-slate-500 flex flex-col items-center">
+        <i data-lucide="clock" class="w-4 h-4"></i>
+        <span class="text-[10px]">Pre-Book</span>
+      </button>
+      <button onclick="switchTab('stationery')" id="m-tab-stationery" class="px-2 py-1 rounded-lg font-semibold text-slate-500 flex flex-col items-center">
+        <i data-lucide="pen-tool" class="w-4 h-4"></i>
+        <span class="text-[10px]">Stationery</span>
+      </button>
+      <button onclick="switchTab('xerox')" id="m-tab-xerox" class="px-2 py-1 rounded-lg font-semibold text-slate-500 flex flex-col items-center">
+        <i data-lucide="printer" class="w-4 h-4"></i>
+        <span class="text-[10px]">Printout</span>
+      </button>
+      <button onclick="switchTab('tracker')" id="m-tab-tracker" class="px-2 py-1 rounded-lg font-semibold text-slate-500 flex flex-col items-center">
+        <i data-lucide="bell" class="w-4 h-4"></i>
+        <span class="text-[10px]">Tracker</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 text-white py-6 px-4 sm:px-6 relative overflow-hidden shadow-inner">
+    <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
+      <i data-lucide="sparkles" class="w-64 h-64"></i>
+    </div>
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="text-center sm:text-left">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-medium text-orange-50 mb-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Campus Central Kitchen & Desk Open
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Skip the Canteen Queue & Xerox Line!</h1>
+        <p class="text-orange-100 text-xs sm:text-sm mt-1 max-w-xl">
+          Order steaming hot meals, pre-book for recess, buy emergency lab manuals, or upload lecture notes for quick printout pickup.
+        </p>
+      </div>
+      <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md p-2.5 rounded-2xl border border-white/20 text-xs">
+        <div class="p-2 bg-white/20 rounded-xl">
+          <i data-lucide="clock" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <span class="text-orange-200 block text-[10px]">Current Kitchen Status</span>
+          <span class="font-bold text-white text-sm">Avg Prep: 8-12 mins</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+
+    <!-- ==================== VIEW 1: CANTEEN MENU ==================== -->
+    <section id="view-canteen" class="tab-view block space-y-6">
+      <!-- Search & Filters -->
+      <div class="flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
+        <div class="relative flex-1 max-w-md">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input type="text" id="food-search-input" oninput="filterFoodItems()" placeholder="Search samosa, burger, chai, paneer meal..." 
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-orange-500 focus:border-transparent transition">
+        </div>
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+          <button onclick="setCategoryFilter('all')" class="cat-pill active px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-orange-600 text-white">All Items</button>
+          <button onclick="setCategoryFilter('quick-bites')" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-600 border border-slate-200 hover:border-orange-300">Quick Bites</button>
+          <button onclick="setCategoryFilter('meals')" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-600 border border-slate-200 hover:border-orange-300">Hearty Meals</button>
+          <button onclick="setCategoryFilter('beverages')" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-600 border border-slate-200 hover:border-orange-300">Chai & Drinks</button>
+          <button onclick="setCategoryFilter('healthy')" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-600 border border-slate-200 hover:border-orange-300">Healthy Corner</button>
+        </div>
+      </div>
+
+      <!-- Quick Pre-Book Alert Strip -->
+      <div class="p-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-between text-xs text-amber-900">
+        <div class="flex items-center gap-2">
+          <i data-lucide="bell" class="w-4 h-4 text-amber-600"></i>
+          <span><strong>In lecture right now?</strong> Pre-order your hot meal ahead of time for the 1:15 PM lunch bell!</span>
+        </div>
+        <button onclick="switchTab('prebook')" class="px-3 py-1 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition">Pre-Book Slot</button>
+      </div>
+
+      <!-- Food Grid -->
+      <div id="canteen-items-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: PRE-BOOK MEALS ==================== -->
+    <section id="view-prebook" class="tab-view hidden space-y-6">
+      <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-white p-6 rounded-3xl shadow-md">
+        <div class="max-w-2xl">
+          <span class="inline-flex items-center gap-1 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold mb-2">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Priority Express Counter
+          </span>
+          <h2 class="text-2xl font-black">Pre-Book Scheduled Meals</h2>
+          <p class="text-xs sm:text-sm text-amber-100 mt-1">
+            Choose your class break slot. The canteen starts cooking exactly 10 minutes before your slot so it is hot and packed right as you walk out of your hall!
+          </p>
+        </div>
+      </div>
+
+      <!-- Slot Selector -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Select Your Pickup Break Slot</label>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="slot-selector-container">
+          <!-- Dynamically populated or static slots -->
+          <div onclick="selectSlot('slot-1')" id="slot-1" class="slot-card cursor-pointer p-3 rounded-xl border-2 border-orange-500 bg-orange-50/70 transition flex flex-col">
+            <span class="text-xs font-semibold text-slate-600">Morning Break</span>
+            <span class="text-sm font-bold text-orange-600 mt-0.5">11:15 AM - 11:30 AM</span>
+            <span class="text-[10px] text-emerald-600 font-medium mt-1">⚡ 8 slots left</span>
+          </div>
+          <div onclick="selectSlot('slot-2')" id="slot-2" class="slot-card cursor-pointer p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-slate-300 transition flex flex-col">
+            <span class="text-xs font-semibold text-slate-600">Lunch Slot A</span>
+            <span class="text-sm font-bold text-slate-800 mt-0.5">1:00 PM - 1:20 PM</span>
+            <span class="text-[10px] text-emerald-600 font-medium mt-1">⚡ 15 slots left</span>
+          </div>
+          <div onclick="selectSlot('slot-3')" id="slot-3" class="slot-card cursor-pointer p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-slate-300 transition flex flex-col">
+            <span class="text-xs font-semibold text-slate-600">Lunch Slot B</span>
+            <span class="text-sm font-bold text-slate-800 mt-0.5">1:30 PM - 1:50 PM</span>
+            <span class="text-[10px] text-emerald-600 font-medium mt-1">⚡ 12 slots left</span>
+          </div>
+          <div onclick="selectSlot('slot-4')" id="slot-4" class="slot-card cursor-pointer p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-slate-300 transition flex flex-col">
+            <span class="text-xs font-semibold text-slate-600">Evening Tea Break</span>
+            <span class="text-sm font-bold text-slate-800 mt-0.5">4:30 PM - 4:45 PM</span>
+            <span class="text-[10px] text-emerald-600 font-medium mt-1">⚡ 22 slots left</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prebook Combos and Meals -->
+      <div>
+        <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+          <i data-lucide="flame" class="w-4 h-4 text-orange-500"></i> Special Pre-Book Combos & Thalis
+        </h3>
+        <div id="prebook-items-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <!-- Populated from JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 3: STATIONERY & SUPPLIES ==================== -->
+    <section id="view-stationery" class="tab-view hidden space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-teal-50 border border-teal-200 p-5 rounded-2xl">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-md">
+            <i data-lucide="book-open" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-teal-950">Campus Stationery & Lab Store</h2>
+            <p class="text-xs text-teal-700">Exam blue books, assignment record sheets, drafting tools & everyday stationery.</p>
+          </div>
+        </div>
+        <div class="text-xs bg-white text-teal-800 font-semibold px-3 py-1.5 rounded-lg border border-teal-300 shadow-2xs">
+          Pickup Desk: Counter 4 (Beside Library)
+        </div>
+      </div>
+
+      <!-- Stationery Items Grid -->
+      <div id="stationery-items-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 4: PRINTOUT & XEROX HUB ==================== -->
+    <section id="view-xerox" class="tab-view hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Upload & Options Left Column -->
+        <div class="lg:col-span-7 space-y-5">
+          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+            <h2 class="text-base font-bold text-slate-800 flex items-center gap-2 mb-1">
+              <i data-lucide="file-up" class="w-5 h-5 text-indigo-600"></i> Smart Document Upload Simulator
+            </h2>
+            <p class="text-xs text-slate-500 mb-4">Upload assignments, PPT slides, notes, or admit cards. Pick color & binding for instant estimation.</p>
+
+            <!-- Drag & Drop Area -->
+            <div id="drop-zone" class="border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/40 rounded-2xl p-6 text-center transition cursor-pointer flex flex-col items-center justify-center">
+              <input type="file" id="file-input" class="hidden" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.png" onchange="handleFileSelect(event)">
+              <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mb-2">
+                <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+              </div>
+              <p class="text-sm font-semibold text-slate-700">Click to browse or drop file here</p>
+              <p class="text-xs text-slate-400 mt-1">Supports PDF, DOCX, PPTX, JPG (Max 50MB)</p>
+            </div>
+
+            <!-- Uploaded file details badge -->
+            <div id="uploaded-file-banner" class="hidden mt-3 p-3 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between">
+              <div class="flex items-center gap-2 overflow-hidden">
+                <i data-lucide="file-text" class="w-5 h-5 text-indigo-600 shrink-0"></i>
+                <div class="truncate">
+                  <span id="uploaded-file-name" class="text-xs font-bold text-indigo-950 block truncate">Assignment_Final.pdf</span>
+                  <span id="uploaded-file-meta" class="text-[10px] text-indigo-600">14 Pages • 2.4 MB</span>
+                </div>
+              </div>
+              <button onclick="removeUploadedFile()" class="text-xs text-rose-500 hover:text-rose-700 font-semibold p-1">
+                Remove
+              </button>
+            </div>
+
+            <!-- Print Configurator Options -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5 pt-4 border-t border-slate-100">
+              <!-- Page Count -->
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Number of Pages</label>
+                <div class="flex items-center">
+                  <button onclick="adjustPageCount(-1)" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-l-xl text-sm border border-slate-200">-</button>
+                  <input type="number" id="print-pages-count" value="10" min="1" max="500" oninput="updatePrintCalculation()" 
+                    class="w-full text-center py-2 border-y border-slate-200 text-sm font-bold text-slate-800 focus:outline-hidden">
+                  <button onclick="adjustPageCount(1)" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-r-xl text-sm border border-slate-200">+</button>
+                </div>
+              </div>
+
+              <!-- Copies Count -->
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Number of Sets / Copies</label>
+                <div class="flex items-center">
+                  <button onclick="adjustCopiesCount(-1)" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-l-xl text-sm border border-slate-200">-</button>
+                  <input type="number" id="print-copies-count" value="1" min="1" max="20" oninput="updatePrintCalculation()" 
+                    class="w-full text-center py-2 border-y border-slate-200 text-sm font-bold text-slate-800 focus:outline-hidden">
+                  <button onclick="adjustCopiesCount(1)" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-r-xl text-sm border border-slate-200">+</button>
+                </div>
+              </div>
+
+              <!-- Print Color Mode -->
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Color Mode</label>
+                <select id="print-color-mode" onchange="updatePrintCalculation()" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-200 bg-white">
+                  <option value="bw">Black & White (₹2.00 / page)</option>
+                  <option value="color">Full Color (₹8.00 / page)</option>
+                </select>
+              </div>
+
+              <!-- Print Sides -->
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Print Sidedness</label>
+                <select id="print-sides" onchange="updatePrintCalculation()" class="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-200 bg-white">
+                  <option value="single">Single Sided</option>
+                  <option value="double">Double Sided (Back-to-back)</option>
+                </select>
+              </div>
+
+              <!-- Binding Options -->
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold text-slate-600 mb-1">Binding & Finishing</label>
+                <div class="grid grid-cols-3 gap-2">
+                  <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 text-xs font-medium cursor-pointer hover:bg-slate-50">
+                    <input type="radio" name="binding-opt" value="0" checked onchange="updatePrintCalculation()" class="text-indigo-600">
+                    <span>None (₹0)</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 text-xs font-medium cursor-pointer hover:bg-slate-50">
+                    <input type="radio" name="binding-opt" value="5" onchange="updatePrintCalculation()" class="text-indigo-600">
+                    <span>Corner Staple (+₹5)</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 text-xs font-medium cursor-pointer hover:bg-slate-50">
+                    <input type="radio" name="binding-opt" value="30" onchange="updatePrintCalculation()" class="text-indigo-600">
+                    <span>Spiral Bound (+₹30)</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Custom Note -->
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold text-slate-600 mb-1">Special Instruction (Optional)</label>
+                <input type="text" id="print-notes" placeholder="e.g. Page 1-4 color only, punch hole on left margin" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 focus:outline-hidden">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Price Breakdown & Add To Cart Right Column -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white p-6 rounded-2xl shadow-lg">
+            <span class="text-[10px] uppercase tracking-wider font-extrabold text-indigo-300">Live Estimate</span>
+            <div class="flex items-baseline justify-between mt-2 mb-4">
+              <span class="text-sm font-medium text-slate-300">Total Print Cost</span>
+              <span id="print-total-display" class="text-3xl font-black text-white">₹20.00</span>
+            </div>
+
+            <div class="space-y-2 text-xs border-t border-slate-700/80 pt-4 text-slate-300">
+              <div class="flex justify-between">
+                <span>Base Page Fee</span>
+                <span id="print-breakdown-pages" class="font-semibold text-white">10 pgs × ₹2.00</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Binding Add-on</span>
+                <span id="print-breakdown-binding" class="font-semibold text-white">₹0.00</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Number of Sets</span>
+                <span id="print-breakdown-copies" class="font-semibold text-white">1 Set</span>
+              </div>
+              <div class="flex justify-between pt-2 border-t border-slate-800 text-emerald-400 font-bold">
+                <span>Estimated Print Time</span>
+                <span>~3 to 5 minutes</span>
+              </div>
+            </div>
+
+            <button onclick="addPrintJobToCart()" class="w-full mt-6 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 active:scale-[0.99] text-white font-bold text-sm transition shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i> Add Printout Order to Cart
+            </button>
+            <p class="text-[10px] text-slate-400 text-center mt-2.5">Pick up at Campus Xerox Corner with your digital order token</p>
+          </div>
+
+          <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl text-xs text-indigo-900 flex items-start gap-3">
+            <i data-lucide="info" class="w-5 h-5 text-indigo-600 shrink-0 mt-0.5"></i>
+            <div>
+              <p class="font-bold">Need Urgent Thesis or Project Hard Binding?</p>
+              <p class="text-[11px] text-indigo-700 mt-0.5">Gold foil hard cover bindings require 3 hours lead time. Speak with Xerox In-Charge at Desk #1.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 5: LIVE ORDER TRACKER & NOTIFICATIONS ==================== -->
+    <section id="view-tracker" class="tab-view hidden space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+        <div>
+          <span class="text-xs uppercase font-extrabold tracking-wider text-orange-600">Live Campus Dispatch</span>
+          <h2 class="text-xl font-black text-slate-800">Order Progress & Pickup Notifications</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Monitor real-time kitchen preparation, xerox printing, and ready-to-collect statuses.</p>
+        </div>
+        <!-- Sound alert tester & toggle -->
+        <div class="flex items-center gap-2">
+          <button onclick="playChime()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition">
+            <i data-lucide="volume-2" class="w-4 h-4"></i> Test Audio Ping
+          </button>
+          <button onclick="simulateNextStage()" class="px-3 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold flex items-center gap-1.5 transition shadow-xs">
+            <i data-lucide="fast-forward" class="w-4 h-4"></i> Advance Demo Stage
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Order Status Card -->
+      <div id="live-order-card" class="bg-white rounded-3xl border border-slate-200 p-6 md:p-8 shadow-sm">
+        <!-- Filled by JS -->
+      </div>
+    </section>
+  </main>
+
+  <!-- CART DRAWER (Off-canvas) -->
+  <div id="cart-drawer-overlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 hidden transition-opacity" onclick="toggleCartDrawer(false)"></div>
+  <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+    <!-- Header -->
+    <div class="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <i data-lucide="shopping-bag" class="w-5 h-5 text-orange-600"></i>
+        <h3 class="font-bold text-slate-800 text-base">Your Campus Tray</h3>
+        <span id="cart-count-title" class="text-xs font-semibold bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">0 items</span>
+      </div>
+      <button onclick="toggleCartDrawer(false)" class="p-2 hover:bg-slate-100 rounded-xl text-slate-500">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- Items list -->
+    <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
+      <!-- Items dynamically injected -->
+    </div>
+
+    <!-- Promo code input -->
+    <div class="px-5 py-2.5 bg-slate-50 border-t border-slate-200">
+      <div class="flex gap-2">
+        <input type="text" id="promo-input" placeholder="Coupon (e.g. CAMPUS10)" class="uppercase text-xs font-semibold px-3 py-2 border border-slate-300 rounded-xl flex-1 focus:outline-hidden">
+        <button onclick="applyPromoCode()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition">Apply</button>
+      </div>
+      <div id="promo-status" class="text-[11px] font-medium mt-1 hidden"></div>
+    </div>
+
+    <!-- Footer / Checkout trigger -->
+    <div class="p-5 border-t border-slate-200 bg-white space-y-3">
+      <div class="space-y-1.5 text-xs text-slate-600">
+        <div class="flex justify-between">
+          <span>Subtotal</span>
+          <span id="cart-subtotal" class="font-semibold text-slate-800">₹0.00</span>
+        </div>
+        <div class="flex justify-between" id="discount-row" style="display: none;">
+          <span class="text-emerald-600">Discount (CAMPUS10)</span>
+          <span id="cart-discount" class="font-semibold text-emerald-600">-₹0.00</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Platform & Kitchen Service</span>
+          <span class="font-semibold text-slate-800">₹2.00</span>
+        </div>
+        <div class="flex justify-between text-sm font-bold text-slate-900 pt-2 border-t border-slate-100">
+          <span>Grand Total</span>
+          <span id="cart-grandtotal" class="text-lg font-black text-orange-600">₹0.00</span>
+        </div>
+      </div>
+
+      <button onclick="openPaymentModal()" id="btn-proceed-checkout" class="w-full py-3.5 rounded-2xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm shadow-md shadow-orange-500/25 transition flex items-center justify-center gap-2">
+        <span>Proceed to Pay & Place Order</span>
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- PAYMENT MODAL -->
+  <div id="payment-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-slate-200 transition-all">
+      <div class="bg-gradient-to-r from-orange-600 to-amber-600 p-5 text-white flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-orange-100">Campus FastPay Gateway</span>
+          <h3 class="text-lg font-bold">Select Online Payment Method</h3>
+        </div>
+        <button onclick="closePaymentModal()" class="p-1.5 rounded-full hover:bg-white/20 text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-5">
+        <!-- Amount reminder -->
+        <div class="flex items-center justify-between p-3.5 bg-orange-50 rounded-2xl border border-orange-200">
+          <div>
+            <span class="text-xs text-orange-700 block">Payable Amount</span>
+            <span id="modal-pay-amount" class="text-xl font-black text-orange-950">₹0.00</span>
+          </div>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-orange-200/80 text-orange-800">Instant Verification</span>
+        </div>
+
+        <!-- Payment Mode Selectors -->
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="setPaymentMethod('upi')" id="paytab-upi" class="pay-method-tab active p-2.5 rounded-xl border-2 border-orange-500 bg-orange-50/50 text-xs font-bold text-orange-700 flex flex-col items-center gap-1">
+            <i data-lucide="qr-code" class="w-5 h-5"></i> UPI / QR
+          </button>
+          <button onclick="setPaymentMethod('card')" id="paytab-card" class="pay-method-tab p-2.5 rounded-xl border-2 border-slate-200 bg-white text-xs font-bold text-slate-700 flex flex-col items-center gap-1 hover:border-slate-300">
+            <i data-lucide="credit-card" class="w-5 h-5"></i> Debit / Credit
+          </button>
+          <button onclick="setPaymentMethod('idwallet')" id="paytab-idwallet" class="pay-method-tab p-2.5 rounded-xl border-2 border-slate-200 bg-white text-xs font-bold text-slate-700 flex flex-col items-center gap-1 hover:border-slate-300">
+            <i data-lucide="wallet" class="w-5 h-5"></i> Student ID
+          </button>
+        </div>
+
+        <!-- Dynamic Payment Container -->
+        <!-- Option 1: UPI -->
+        <div id="payform-upi" class="payform-block space-y-4">
+          <div class="flex flex-col items-center justify-center p-4 bg-slate-50 rounded-2xl border border-slate-200 text-center">
+            <!-- Simulated QR code -->
+            <div class="w-36 h-36 bg-white p-2 rounded-xl border border-slate-300 shadow-xs flex items-center justify-center relative mb-2">
+              <svg viewBox="0 0 100 100" class="w-full h-full text-slate-900" fill="currentColor">
+                <path d="M0,0 h30 v30 h-30 z M10,10 h10 v10 h-10 z M70,0 h30 v30 h-30 z M80,10 h10 v10 h-10 z M0,70 h30 v30 h-30 z M10,80 h10 v10 h-10 z M40,10 h10 v10 h-10 z M50,30 h10 v10 h-10 z M30,50 h10 v20 h-10 z M50,50 h20 v10 h-20 z M70,50 h10 v20 h-10 z M80,80 h20 v20 h-20 z M40,80 h20 v10 h-20 z" />
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <span class="bg-orange-600 text-white text-[9px] font-extrabold px-1 rounded shadow-xs">UPI</span>
+              </div>
+            </div>
+            <p class="text-xs font-medium text-slate-600">Scan via GPay, PhonePe, Paytm, or BHIM</p>
+            <p class="text-[11px] text-slate-400">UPI ID: campusbite@collegebank</p>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Or Enter UPI ID / VPA</label>
+            <input type="text" placeholder="rollnumber@okhdfcbank" value="student2026@oksbi" class="w-full text-xs p-2.5 rounded-xl border border-slate-200">
+          </div>
+        </div>
+
+        <!-- Option 2: Card -->
+        <div id="payform-card" class="payform-block hidden space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Card Number</label>
+            <input type="text" placeholder="4111 •••• •••• 8892" value="4532 8920 1204 9081" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 font-mono">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Expiry (MM/YY)</label>
+              <input type="text" placeholder="08/28" value="12/28" class="w-full text-xs p-2.5 rounded-xl border border-slate-200">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">CVV</label>
+              <input type="password" placeholder="•••" value="842" class="w-full text-xs p-2.5 rounded-xl border border-slate-200 font-mono">
+            </div>
+          </div>
+        </div>
+
+        <!-- Option 3: Student ID Card Wallet -->
+        <div id="payform-idwallet" class="payform-block hidden space-y-3">
+          <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs space-y-1">
+            <div class="flex justify-between font-bold text-emerald-950">
+              <span>Smart ID: #CAMPUS-8921-CS</span>
+              <span class="text-emerald-700">Active</span>
+            </div>
+            <p class="text-slate-600">Available Pre-loaded Balance: <strong class="text-slate-800">₹480.00</strong></p>
+            <p class="text-[10px] text-emerald-700">Deducts instantly without OTP. Ideal during brief 10 min break queues.</p>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Enter 4-Digit Student Security PIN</label>
+            <input type="password" value="1234" maxlength="4" class="w-full text-center tracking-widest text-lg font-bold p-2 rounded-xl border border-slate-200">
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button onclick="processSimulatedPayment()" id="btn-pay-now" class="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md shadow-emerald-600/20 transition flex items-center justify-center gap-2">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+          <span id="btn-pay-text">Confirm & Authorize Payment</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6 rounded-lg bg-orange-600 text-white flex items-center justify-center text-xs font-black">CB</div>
+        <span class="font-bold text-slate-700">CampusBite Portal</span>
+        <span>• Student Union Services & Food Co-op</span>
+      </div>
+      <div>
+        <span>Counter Support & Helpdesk: Intercom 402 / Ground Floor Cafeteria</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* =========================================================
+       1. DATA DEFINITIONS (CANTEEN, STATIONERY, ORDER TRACKING)
+       ========================================================= */
+
+    const CANTEEN_DATA = [
+      {
+        id: 'c1',
+        title: 'Crispy Samosa Platter (2 Pcs)',
+        desc: 'Freshly fried spicy potato filling served with tamarind & mint chutney.',
+        price: 30,
+        veg: true,
+        category: 'quick-bites',
+        prepTime: '4 mins',
+        image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'c2',
+        title: 'Classic Masala Cheese Toast',
+        desc: 'Grilled sandwich loaded with onions, tomatoes, melted cheese and chaat masala.',
+        price: 65,
+        veg: true,
+        category: 'quick-bites',
+        prepTime: '7 mins',
+        image: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'c3',
+        title: 'Special North Indian Deluxe Thali',
+        desc: 'Paneer butter masala, dal tadka, 2 buttery rotis, jeera rice, salad & sweet.',
+        price: 130,
+        veg: true,
+        category: 'meals',
+        prepTime: '12 mins',
+        image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'c4',
+        title: 'Butter Chicken Rice Bowl',
+        desc: 'Tender chicken in rich aromatic tomato gravy over basmati jeera rice.',
+        price: 140,
+        veg: false,
+        category: 'meals',
+        prepTime: '10 mins',
+        image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'c5',
+        title: 'Schezwan Fried Rice with Veg Manchurian',
+        desc: 'Spicy wok tossed Indo-Chinese rice served with deep-fried gravy vegetable balls.',
+        price: 110,
+        veg: true,
+        category: 'meals',
+        prepTime: '8 mins',
+        image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'c6',
+        title: 'Kulhad Ginger Adrak Chai',
+        desc: 'Strong brewed milk tea with crushed ginger & cardamom served in earthen clay cup.',
+        price: 20,
+        veg: true,
+        category: 'beverages',
+        prepTime: '3 mins',
+        image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'c7',
+        title: 'Thick Cold Coffee with Chocolate Drizzle',
+        desc: 'Chilled creamy blended espresso milk shake topped with chocolate syrup.',
+        price: 55,
+        veg: true,
+        category: 'beverages',
+        prepTime: '4 mins',
+        image: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'c8',
+        title: 'High-Protein Sprout & Paneer Salad',
+        desc: 'Moong sprouts, diced fresh paneer, bell peppers, lemon vinaigrette and roasted peanuts.',
+        price: 80,
+        veg: true,
+        category: 'healthy',
+        prepTime: '5 mins',
+        image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=500&q=80'
+      }
+    ];
+
+    const PREBOOK_DATA = [
+      {
+        id: 'pb1',
+        title: 'Exam Day Rush Combo',
+        desc: 'Aloo Paratha (2 pcs) with fresh curd, pickle + 1 Cold Coffee. Cooked fresh for break.',
+        price: 110,
+        veg: true,
+        slotName: 'Reserved Break Slot',
+        image: 'https://images.unsplash.com/photo-1626074353765-517a681e40be?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'pb2',
+        title: 'Executive Student Lunch Box',
+        desc: 'Paneer Makhani, 3 Phulkas, Rice, Raita & Gulab Jamun. Keep ready in warmer box.',
+        price: 145,
+        veg: true,
+        slotName: 'Lunch Slot',
+        image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'pb3',
+        title: 'Crunchy Chicken Burger & Peri-Peri Fries',
+        desc: 'Crispy fried chicken breast, chipotle mayo, toasted brioche bun + seasoned fries.',
+        price: 135,
+        veg: false,
+        slotName: 'Evening Slot',
+        image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'pb4',
+        title: 'Fresh Fruit Medley & Greek Yogurt',
+        desc: 'Sliced seasonal apples, papaya, pomegranate seeds with honey & chia seeds.',
+        price: 75,
+        veg: true,
+        slotName: 'Morning Slot',
+        image: 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&w=500&q=80'
+      }
+    ];
+
+    const STATIONERY_DATA = [
+      {
+        id: 's1',
+        title: 'Assignment Ruled Long Book (180 pgs)',
+        desc: 'High-grade paper, margin ruled, spiral bound for lab and semester submissions.',
+        price: 65,
+        image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=500&q=80',
+        badge: 'Best Seller'
+      },
+      {
+        id: 's2',
+        title: 'Ballpoint Pen Combo (Pack of 5 - Blue/Black)',
+        desc: '0.7mm quick-drying waterproof ink, non-slip grip ideal for fast 3-hour exams.',
+        price: 45,
+        image: 'https://images.unsplash.com/photo-1585336261026-418041005bc4?auto=format&fit=crop&w=500&q=80',
+        badge: 'Exam Pack'
+      },
+      {
+        id: 's3',
+        title: 'Engineering Mini Drafter & Scale Set',
+        desc: 'Precision steel arm drafter with 360-degree protractor head & carry bag.',
+        price: 380,
+        image: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?auto=format&fit=crop&w=500&q=80',
+        badge: 'Engg Drawing'
+      },
+      {
+        id: 's4',
+        title: 'Scientific Calculator fx-991CW',
+        desc: 'High-resolution 4-gradation display, 540 functions, approved for campus exams.',
+        price: 1250,
+        image: 'https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?auto=format&fit=crop&w=500&q=80',
+        badge: 'Lab Approved'
+      },
+      {
+        id: 's5',
+        title: 'Sticky Notes & Page Flags Pad (400 Sheets)',
+        desc: 'Multicolor neon sticky pads for bookmarking library books and lecture notes.',
+        price: 50,
+        image: 'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=500&q=80',
+        badge: 'Study Tool'
+      },
+      {
+        id: 's6',
+        title: 'Standard Lab Coat (Unisex Cotton)',
+        desc: 'Full sleeve knee-length white lab apron with double chest & side pockets.',
+        price: 290,
+        image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=500&q=80',
+        badge: 'Chem / Bio'
+      }
+    ];
+
+    /* =========================================================
+       2. APPLICATION STATE
+       ========================================================= */
+    let cart = [];
+    let activeTab = 'canteen';
+    let currentFoodCategory = 'all';
+    let selectedSlotId = 'slot-1';
+    let selectedSlotLabel = '11:15 AM - 11:30 AM (Morning Break)';
+    let appliedDiscount = 0;
+    let selectedPaymentMethod = 'upi';
+    let walletBalance = 480;
+
+    // Simulated Active Orders
+    let currentOrder = {
+      token: '#CB-4182',
+      stageIndex: 1, // 0: Received, 1: Preparing/Printing, 2: Ready for Pickup
+      items: [
+        { title: 'Crispy Samosa Platter (2 Pcs)', qty: 1, price: 30 },
+        { title: 'Kulhad Ginger Adrak Chai', qty: 2, price: 40 }
+      ],
+      type: 'Canteen Order',
+      pickupLocation: 'Counter 2 (Hot Snacks Kitchen)',
+      timestamp: '10:40 AM',
+      total: 72
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCanteenItems();
+      renderPrebookItems();
+      renderStationeryItems();
+      updatePrintCalculation();
+      renderTrackerView();
+      updateCartUI();
+      lucide.createIcons();
+    });
+
+    /* =========================================================
+       3. NAVIGATION & TAB SWITCHING
+       ========================================================= */
+    function switchTab(tabId) {
+      activeTab = tabId;
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+      const targetView = document.getElementById(`view-${tabId}`);
+      if (targetView) targetView.classList.remove('hidden');
+
+      // Update Desktop Tabs
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-white', 'text-orange-600', 'shadow-xs');
+        btn.classList.add('text-slate-600');
+      });
+      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-white', 'text-orange-600', 'shadow-xs');
+        activeBtn.classList.remove('text-slate-600');
+      }
+
+      // Update Mobile Tabs
+      ['canteen', 'prebook', 'stationery', 'xerox', 'tracker'].forEach(t => {
+        const mBtn = document.getElementById(`m-tab-${t}`);
+        if (mBtn) {
+          if (t === tabId) {
+            mBtn.classList.add('text-orange-600');
+            mBtn.classList.remove('text-slate-500');
+          } else {
+            mBtn.classList.remove('text-orange-600');
+            mBtn.classList.add('text-slate-500');
+          }
+        }
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    function renderCanteenItems(filter = '') {
+      const grid = document.getElementById('canteen-items-grid');
+      grid.innerHTML = '';
+
+      const filtered = CANTEEN_DATA.filter(item => {
+        const matchesCategory = currentFoodCategory === 'all' || item.category === currentFoodCategory;
+        const matchesSearch = item.title.toLowerCase().includes(filter.toLowerCase()) || 
+                              item.desc.toLowerCase().includes(filter.toLowerCase());
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-400">
+            <i data-lucide="utensils-crossed" class="w-10 h-10 mx-auto mb-2 text-slate-300"></i>
+            <p class="font-medium text-sm">No delicious items match your search.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col group";
+        card.innerHTML = `
+          <div class="relative h-44 w-full overflow-hidden bg-slate-100">
+            <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://placehold.co/400x250/fee2e2/991b1b?text=Campus+Bite'">
+            <div class="absolute top-2.5 left-2.5 flex gap-1.5">
+              <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${item.veg ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300'}">
+                <span class="w-1.5 h-1.5 rounded-full ${item.veg ? 'bg-emerald-600' : 'bg-rose-600'}"></span>
+                ${item.veg ? 'Pure Veg' : 'Non-Veg'}
+              </span>
+            </div>
+            <div class="absolute bottom-2 right-2 bg-slate-900/80 backdrop-blur-xs text-white text-[11px] font-medium px-2 py-0.5 rounded-lg flex items-center gap-1">
+              <i data-lucide="clock" class="w-3 h-3"></i> ${item.prepTime}
+            </div>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <h4 class="font-bold text-slate-800 text-sm leading-snug group-hover:text-orange-600 transition">${item.title}</h4>
+              <p class="text-xs text-slate-500 mt-1 line-clamp-2">${item.desc}</p>
+            </div>
+            <div class="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-slate-400 block">Price</span>
+                <span class="text-base font-extrabold text-slate-900">₹${item.price.toFixed(2)}</span>
+              </div>
+              <button onclick="addToCart('${item.id}', '${escapeQuotes(item.title)}', ${item.price}, 'food')" 
+                class="px-3.5 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 active:scale-95 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-xs">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add
+              </button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function setCategoryFilter(cat) {
+      currentFoodCategory = cat;
+      document.querySelectorAll('.cat-pill').forEach(btn => {
+        btn.classList.remove('bg-orange-600', 'text-white');
+        btn.classList.add('bg-white', 'text-slate-600');
+      });
+      event.target.classList.add('bg-orange-600', 'text-white');
+      event.target.classList.remove('bg-white', 'text-slate-600');
+      filterFoodItems();
+    }
+
+    function filterFoodItems() {
+      const q = document.getElementById('food-search-input').value;
+      renderCanteenItems(q);
+    }
+
+    function selectSlot(slotId) {
+      selectedSlotId = slotId;
+      document.querySelectorAll('.slot-card').forEach(c => {
+        c.className = "slot-card cursor-pointer p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-slate-300 transition flex flex-col";
+      });
+      const selected = document.getElementById(slotId);
+      selected.className = "slot-card cursor-pointer p-3 rounded-xl border-2 border-orange-500 bg-orange-50/70 transition flex flex-col";
+
+      const times = {
+        'slot-1': '11:15 AM - 11:30 AM (Morning Break)',
+        'slot-2': '1:00 PM - 1:20 PM (Lunch Slot A)',
+        'slot-3': '1:30 PM - 1:50 PM (Lunch Slot B)',
+        'slot-4': '4:30 PM - 4:45 PM (Evening Tea Break)'
+      };
+      selectedSlotLabel = times[slotId] || 'Selected Slot';
+      showToast(`Selected break slot: ${selectedSlotLabel}`);
+    }
+
+    function renderPrebookItems() {
+      const grid = document.getElementById('prebook-items-grid');
+      grid.innerHTML = '';
+      PREBOOK_DATA.forEach(item => {
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col";
+        card.innerHTML = `
+          <div class="relative h-40 w-full overflow-hidden bg-slate-100">
+            <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x250/fff7ed/ea580c?text=PreBook+Meal'">
+            <div class="absolute top-2.5 left-2.5">
+              <span class="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full ${item.veg ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300'}">
+                ${item.veg ? 'Veg Combo' : 'Non-Veg'}
+              </span>
+            </div>
+            <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-xs text-white text-[10px] font-semibold px-2 py-0.5 rounded-md">
+              ⚡ Pre-Reserved Batch
+            </div>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <h4 class="font-bold text-slate-800 text-sm">${item.title}</h4>
+              <p class="text-xs text-slate-500 mt-1">${item.desc}</p>
+            </div>
+            <div class="pt-3 mt-2 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-slate-400 block">Slot Price</span>
+                <span class="text-base font-extrabold text-slate-900">₹${item.price.toFixed(2)}</span>
+              </div>
+              <button onclick="addPrebookToCart('${item.id}', '${escapeQuotes(item.title)}', ${item.price})" 
+                class="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 active:scale-95 text-white font-bold text-xs flex items-center gap-1.5 transition">
+                <i data-lucide="clock" class="w-3.5 h-3.5"></i> Pre-Book
+              </button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function addPrebookToCart(id, title, price) {
+      const fullTitle = `${title} [Slot: ${selectedSlotLabel.split(' ')[0]}]`;
+      addToCart(id + '-slot', fullTitle, price, 'prebook', { slot: selectedSlotLabel });
+    }
+
+    function renderStationeryItems() {
+      const grid = document.getElementById('stationery-items-grid');
+      grid.innerHTML = '';
+      STATIONERY_DATA.forEach(item => {
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col";
+        card.innerHTML = `
+          <div class="relative h-44 w-full overflow-hidden bg-slate-50">
+            <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x250/e0f2fe/0369a1?text=Stationery'">
+            <div class="absolute top-2.5 left-2.5">
+              <span class="bg-teal-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs">
+                ${item.badge}
+              </span>
+            </div>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <h4 class="font-bold text-slate-800 text-sm">${item.title}</h4>
+              <p class="text-xs text-slate-500 mt-1">${item.desc}</p>
+            </div>
+            <div class="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-slate-400 block">Unit Cost</span>
+                <span class="text-base font-extrabold text-slate-900">₹${item.price.toFixed(2)}</span>
+              </div>
+              <button onclick="addToCart('${item.id}', '${escapeQuotes(item.title)}', ${item.price}, 'stationery')" 
+                class="px-3.5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center gap-1.5 transition">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add
+              </button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    let currentUploadedFileName = "Lecture_Unit_4_Notes.pdf";
+
+    // File Drag & Drop Setup
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('border-indigo-500', 'bg-indigo-100/50');
+    });
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('border-indigo-500', 'bg-indigo-100/50');
+    });
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-indigo-500', 'bg-indigo-100/50');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        simulateUploadedFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    function handleFileSelect(e) {
+      if (e.target.files && e.target.files[0]) {
+        simulateUploadedFile(e.target.files[0]);
+      }
+    }
+
+    function simulateUploadedFile(file) {
+      currentUploadedFileName = file.name;
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+      // Random simulated pages between 4 and 25
+      const randomPages = Math.floor(Math.random() * 20) + 4;
+      document.getElementById('print-pages-count').value = randomPages;
+
+      document.getElementById('uploaded-file-banner').classList.remove('hidden');
+      document.getElementById('uploaded-file-name').textContent = file.name;
+      document.getElementById('uploaded-file-meta').textContent = `${randomPages} Detected Pages • ${sizeMb > 0 ? sizeMb : '1.2'} MB`;
+
+      updatePrintCalculation();
+      showToast(`Analyzed ${file.name}: ${randomPages} pages detected.`);
+    }
+
+    function removeUploadedFile() {
+      currentUploadedFileName = "Custom_Print_Document.pdf";
+      document.getElementById('uploaded-file-banner').classList.add('hidden');
+      document.getElementById('print-pages-count').value = 10;
+      updatePrintCalculation();
+    }
+
+    function adjustPageCount(delta) {
+      const input = document.getElementById('print-pages-count');
+      let val = parseInt(input.value) || 1;
+      val = Math.max(1, Math.min(500, val + delta));
+      input.value = val;
+      updatePrintCalculation();
+    }
+
+    function adjustCopiesCount(delta) {
+      const input = document.getElementById('print-copies-count');
+      let val = parseInt(input.value) || 1;
+      val = Math.max(1, Math.min(20, val + delta));
+      input.value = val;
+      updatePrintCalculation();
+    }
+
+    function updatePrintCalculation() {
+      const pages = parseInt(document.getElementById('print-pages-count').value) || 1;
+      const copies = parseInt(document.getElementById('print-copies-count').value) || 1;
+      const colorMode = document.getElementById('print-color-mode').value;
+      const bindingOpt = parseInt(document.querySelector('input[name="binding-opt"]:checked')?.value || '0');
+
+      const ratePerPage = colorMode === 'color' ? 8.00 : 2.00;
+      const pageCost = pages * ratePerPage;
+      const totalPerSet = pageCost + bindingOpt;
+      const grandTotal = totalPerSet * copies;
+
+      document.getElementById('print-total-display').textContent = `₹${grandTotal.toFixed(2)}`;
+      document.getElementById('print-breakdown-pages').textContent = `${pages} pgs × ₹${ratePerPage.toFixed(2)}`;
+      document.getElementById('print-breakdown-binding').textContent = bindingOpt > 0 ? `+₹${bindingOpt.toFixed(2)}` : '₹0.00';
+      document.getElementById('print-breakdown-copies').textContent = `${copies} ${copies > 1 ? 'Sets' : 'Set'}`;
+    }
+
+    function addPrintJobToCart() {
+      const pages = parseInt(document.getElementById('print-pages-count').value) || 1;
+      const copies = parseInt(document.getElementById('print-copies-count').value) || 1;
+      const colorMode = document.getElementById('print-color-mode').value;
+      const sides = document.getElementById('print-sides').value;
+      const bindingOpt = parseInt(document.querySelector('input[name="binding-opt"]:checked')?.value || '0');
+      const notes = document.getElementById('print-notes').value.trim();
+
+      const ratePerPage = colorMode === 'color' ? 8.00 : 2.00;
+      const totalAmount = ((pages * ratePerPage) + bindingOpt) * copies;
+
+      const printSummary = `Printout: ${currentUploadedFileName} (${pages} pgs, ${colorMode.toUpperCase()}, ${copies} sets)`;
+
+      addToCart(
+        'print-' + Date.now(),
+        printSummary,
+        totalAmount,
+        'xerox',
+        {
+          pages,
+          copies,
+          colorMode,
+          sides,
+          bindingOpt,
+          notes: notes || 'Standard print'
+        }
+      );
+
+      showToast(`Added printout job for ${currentUploadedFileName} to cart!`);
+      toggleCartDrawer(true);
+    }
+
+    function addToCart(id, title, price, type, extraMeta = {}) {
+      const existing = cart.find(i => i.id === id);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({
+          id,
+          title,
+          price,
+          qty: 1,
+          type,
+          meta: extraMeta
+        });
+      }
+      updateCartUI();
+      showToast(`Added "${title.length > 25 ? title.substring(0, 22) + '...' : title}" to cart`);
+    }
+
+    function changeCartItemQty(id, delta) {
+      const item = cart.find(i => i.id === id);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) {
+        cart = cart.filter(i => i.id !== id);
+      }
+      updateCartUI();
+    }
+
+    function removeCartItem(id) {
+      cart = cart.filter(i => i.id !== id);
+      updateCartUI();
+      showToast('Item removed from tray.');
+    }
+
+    function updateCartUI() {
+      const totalItemsCount = cart.reduce((acc, curr) => acc + curr.qty, 0);
+      document.getElementById('cart-badge-count').textContent = totalItemsCount;
+      document.getElementById('cart-count-title').textContent = `${totalItemsCount} ${totalItemsCount === 1 ? 'item' : 'items'}`;
+
+      const container = document.getElementById('cart-items-container');
+      container.innerHTML = '';
+
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-slate-400">
+            <i data-lucide="shopping-basket" class="w-12 h-12 mx-auto mb-2 text-slate-300"></i>
+            <p class="font-bold text-slate-600">Your campus tray is empty!</p>
+            <p class="text-xs text-slate-400 mt-1">Order canteen snacks, stationery, or upload printouts.</p>
+          </div>
+        `;
+        document.getElementById('cart-subtotal').textContent = '₹0.00';
+        document.getElementById('cart-grandtotal').textContent = '₹0.00';
+        document.getElementById('btn-proceed-checkout').disabled = true;
+        document.getElementById('btn-proceed-checkout').classList.add('opacity-50', 'pointer-events-none');
+        lucide.createIcons();
+        return;
+      }
+
+      document.getElementById('btn-proceed-checkout').disabled = false;
+      document.getElementById('btn-proceed-checkout').classList.remove('opacity-50', 'pointer-events-none');
+
+      let subtotal = 0;
+
+      cart.forEach(item => {
+        const itemTotal = item.price * item.qty;
+        subtotal += itemTotal;
+
+        let iconName = 'utensils';
+        if (item.type === 'xerox') iconName = 'printer';
+        if (item.type === 'stationery') iconName = 'pen-tool';
+        if (item.type === 'prebook') iconName = 'calendar';
+
+        const el = document.createElement('div');
+        el.className = "flex items-center justify-between p-3 rounded-2xl border border-slate-200/90 bg-slate-50/50 hover:bg-slate-50 transition";
+        el.innerHTML = `
+          <div class="flex items-center gap-2.5 max-w-[65%]">
+            <div class="w-8 h-8 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+              <i data-lucide="${iconName}" class="w-4 h-4"></i>
+            </div>
+            <div class="truncate">
+              <h5 class="text-xs font-bold text-slate-800 truncate">${item.title}</h5>
+              <span class="text-[11px] font-semibold text-slate-500">₹${item.price.toFixed(2)} ea</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="flex items-center border border-slate-200 bg-white rounded-lg">
+              <button onclick="changeCartItemQty('${item.id}', -1)" class="px-2 py-0.5 text-xs text-slate-600 font-bold hover:bg-slate-100">-</button>
+              <span class="px-1.5 text-xs font-bold text-slate-800">${item.qty}</span>
+              <button onclick="changeCartItemQty('${item.id}', 1)" class="px-2 py-0.5 text-xs text-slate-600 font-bold hover:bg-slate-100">+</button>
+            </div>
+            <span class="text-xs font-bold text-slate-900 min-w-[50px] text-right">₹${itemTotal.toFixed(2)}</span>
+            <button onclick="removeCartItem('${item.id}')" class="text-slate-400 hover:text-rose-500 p-1">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(el);
+      });
+
+      const platformFee = 2.00;
+      const discountVal = (subtotal * appliedDiscount);
+      const grandTotal = Math.max(0, subtotal - discountVal + platformFee);
+
+      document.getElementById('cart-subtotal').textContent = `₹${subtotal.toFixed(2)}`;
+      if (appliedDiscount > 0) {
+        document.getElementById('discount-row').style.display = 'flex';
+        document.getElementById('cart-discount').textContent = `-₹${discountVal.toFixed(2)}`;
+      } else {
+        document.getElementById('discount-row').style.display = 'none';
+      }
+      document.getElementById('cart-grandtotal').textContent = `₹${grandTotal.toFixed(2)}`;
+
+      lucide.createIcons();
+    }
+
+    function toggleCartDrawer(open) {
+      const drawer = document.getElementById('cart-drawer');
+      const overlay = document.getElementById('cart-drawer-overlay');
+      if (open) {
+        overlay.classList.remove('hidden');
+        drawer.classList.remove('translate-x-full');
+      } else {
+        drawer.classList.add('translate-x-full');
+        overlay.classList.add('hidden');
+      }
+    }
+
+    function applyPromoCode() {
+      const code = document.getElementById('promo-input').value.trim().toUpperCase();
+      const statusEl = document.getElementById('promo-status');
+      statusEl.classList.remove('hidden', 'text-emerald-600', 'text-rose-500');
+
+      if (code === 'CAMPUS10') {
+        appliedDiscount = 0.10;
+        statusEl.textContent = '🎉 10% Campus discount applied!';
+        statusEl.classList.add('text-emerald-600');
+        updateCartUI();
+        showToast('Promo code CAMPUS10 activated!');
+      } else {
+        appliedDiscount = 0;
+        statusEl.textContent = 'Invalid promo code. Try "CAMPUS10".';
+        statusEl.classList.add('text-rose-500');
+        updateCartUI();
+      }
+    }
+
+    function openPaymentModal() {
+      if (cart.length === 0) return;
+      toggleCartDrawer(false);
+
+      const grandTotalStr = document.getElementById('cart-grandtotal').textContent;
+      document.getElementById('modal-pay-amount').textContent = grandTotalStr;
+
+      document.getElementById('payment-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closePaymentModal() {
+      document.getElementById('payment-modal').classList.add('hidden');
+    }
+
+    function setPaymentMethod(method) {
+      selectedPaymentMethod = method;
+      document.querySelectorAll('.pay-method-tab').forEach(btn => {
+        btn.className = "pay-method-tab p-2.5 rounded-xl border-2 border-slate-200 bg-white text-xs font-bold text-slate-700 flex flex-col items-center gap-1 hover:border-slate-300";
+      });
+      const activeBtn = document.getElementById(`paytab-${method}`);
+      activeBtn.className = "pay-method-tab active p-2.5 rounded-xl border-2 border-orange-500 bg-orange-50/50 text-xs font-bold text-orange-700 flex flex-col items-center gap-1";
+
+      document.querySelectorAll('.payform-block').forEach(b => b.classList.add('hidden'));
+      document.getElementById(`payform-${method}`).classList.remove('hidden');
+    }
+
+    function processSimulatedPayment() {
+      const btn = document.getElementById('btn-pay-now');
+      const text = document.getElementById('btn-pay-text');
+      const originalText = text.textContent;
+
+      btn.disabled = true;
+      text.textContent = "Verifying with Campus Bank Gateway...";
+
+      setTimeout(() => {
+        // Success
+        btn.disabled = false;
+        text.textContent = originalText;
+        closePaymentModal();
+
+        // Create new active order
+        const randToken = '#CB-' + Math.floor(1000 + Math.random() * 9000);
+        const orderTotal = parseFloat(document.getElementById('cart-grandtotal').textContent.replace('₹', ''));
+
+        // If paid with ID wallet, deduct balance
+        if (selectedPaymentMethod === 'idwallet') {
+          walletBalance = Math.max(0, walletBalance - orderTotal);
+          document.getElementById('wallet-balance').textContent = `₹${walletBalance.toFixed(2)}`;
+        }
+
+        currentOrder = {
+          token: randToken,
+          stageIndex: 0, // Freshly placed
+          items: [...cart],
+          type: cart.some(i => i.type === 'xerox') ? 'Combined Print & Food Order' : 'Canteen Order',
+          pickupLocation: 'Counter 2 & Xerox Desk 1',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          total: orderTotal
+        };
+
+        // Reset cart
+        cart = [];
+        appliedDiscount = 0;
+        document.getElementById('promo-input').value = '';
+        document.getElementById('promo-status').classList.add('hidden');
+        updateCartUI();
+
+        // Switch to Tracker & Notify
+        playChime();
+        renderTrackerView();
+        switchTab('tracker');
+        showToast(`Payment Successful! Generated Token ${randToken}`, 'success');
+
+        // Automatically advance order stage after 12 seconds for realism
+        setTimeout(() => {
+          if (currentOrder && currentOrder.stageIndex === 0) {
+            currentOrder.stageIndex = 1;
+            renderTrackerView();
+            playChime();
+            showToast(`Order ${currentOrder.token} is now Preparing!`);
+          }
+        }, 12000);
+
+      }, 1500);
+    }
+
+    function renderTrackerView() {
+      const trackerContainer = document.getElementById('live-order-card');
+      const indicator = document.getElementById('tracker-indicator');
+
+      if (!currentOrder) {
+        indicator.classList.add('hidden');
+        trackerContainer.innerHTML = `
+          <div class="text-center py-12 text-slate-400">
+            <i data-lucide="package-search" class="w-12 h-12 mx-auto mb-2 text-slate-300"></i>
+            <h4 class="font-bold text-slate-700">No Active Order Right Now</h4>
+            <p class="text-xs text-slate-400 mt-1">Place an order for food, stationery, or printouts to track pickup status.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      indicator.classList.remove('hidden');
+
+      const stages = [
+        { label: 'Order Confirmed', desc: 'Sent to Kitchen & Counter' },
+        { label: 'Preparing / Printing', desc: 'Food being cooked / Print job in queue' },
+        { label: 'Ready for Pickup! 🎉', desc: `Collect at ${currentOrder.pickupLocation}` }
+      ];
+
+      const currentStage = stages[currentOrder.stageIndex];
+      const isReady = currentOrder.stageIndex === 2;
+
+      let itemsSummaryHtml = currentOrder.items.map(it => `
+        <div class="flex justify-between items-center text-xs py-1.5 border-b border-slate-100 last:border-0">
+          <span class="text-slate-700 font-medium">${it.title} <strong class="text-slate-900">×${it.qty}</strong></span>
+          <span class="font-bold text-slate-800">₹${(it.price * it.qty).toFixed(2)}</span>
+        </div>
+      `).join('');
+
+      trackerContainer.innerHTML = `
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-2xl font-black text-orange-600">${currentOrder.token}</span>
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold ${isReady ? 'bg-emerald-100 text-emerald-800 animate-pulse' : 'bg-amber-100 text-amber-800'}">
+                ${currentStage.label}
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Placed at ${currentOrder.timestamp} • ${currentOrder.type}</p>
+          </div>
+          <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/80 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-orange-500 text-white flex items-center justify-center font-bold">
+              <i data-lucide="map-pin" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Pickup Counter</span>
+              <span class="text-xs font-bold text-slate-800">${currentOrder.pickupLocation}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3-Stage Progress Timeline -->
+        <div class="py-8">
+          <div class="relative flex items-center justify-between max-w-2xl mx-auto">
+            <!-- Connecting bar -->
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1.5 bg-slate-100 -z-0"></div>
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 h-1.5 bg-orange-500 transition-all duration-500 -z-0" 
+              style="width: ${currentOrder.stageIndex === 0 ? '0%' : currentOrder.stageIndex === 1 ? '50%' : '100%'}"></div>
+
+            <!-- Step 1 -->
+            <div class="relative z-10 flex flex-col items-center">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold ${currentOrder.stageIndex >= 0 ? 'bg-orange-500 text-white ring-4 ring-orange-100' : 'bg-slate-200 text-slate-500'}">
+                <i data-lucide="check" class="w-4 h-4"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-700 mt-2">Received</span>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="relative z-10 flex flex-col items-center">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold ${currentOrder.stageIndex >= 1 ? 'bg-orange-500 text-white ring-4 ring-orange-100' : 'bg-slate-200 text-slate-500'}">
+                <i data-lucide="${currentOrder.stageIndex === 1 ? 'flame' : 'check'}" class="w-4 h-4 ${currentOrder.stageIndex === 1 ? 'animate-bounce' : ''}"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-700 mt-2">Preparing</span>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="relative z-10 flex flex-col items-center">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold ${currentOrder.stageIndex >= 2 ? 'bg-emerald-600 text-white ring-4 ring-emerald-100' : 'bg-slate-200 text-slate-500'}">
+                <i data-lucide="bell" class="w-4 h-4"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-700 mt-2">Ready</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Banner for Ready status -->
+        ${isReady ? `
+          <div class="p-4 rounded-2xl bg-emerald-500 text-white flex items-center justify-between mb-6 shadow-md shadow-emerald-500/20">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                <i data-lucide="party-popper" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-sm">Order Ready for Collection!</h4>
+                <p class="text-xs text-emerald-100">Show token ${currentOrder.token} to student staff at ${currentOrder.pickupLocation}.</p>
+              </div>
+            </div>
+            <button onclick="dismissCompletedOrder()" class="px-3.5 py-1.5 bg-white text-emerald-800 rounded-xl font-bold text-xs hover:bg-emerald-50 transition">
+              Picked Up & Done
+            </button>
+          </div>
+        ` : ''}
+
+        <!-- Items Summary Box -->
+        <div class="bg-slate-50/80 rounded-2xl p-4 border border-slate-200/80">
+          <span class="text-[10px] uppercase font-bold text-slate-400 block mb-2">Order Items Breakdown</span>
+          <div class="space-y-1">
+            ${itemsSummaryHtml}
+          </div>
+          <div class="pt-3 mt-2 border-t border-slate-200 flex justify-between text-xs font-bold text-slate-800">
+            <span>Paid Online (Total)</span>
+            <span class="text-sm font-extrabold text-orange-600">₹${currentOrder.total.toFixed(2)}</span>
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function simulateNextStage() {
+      if (!currentOrder) {
+        showToast('No active order to advance.');
+        return;
+      }
+      currentOrder.stageIndex = (currentOrder.stageIndex + 1) % 3;
+      renderTrackerView();
+      playChime();
+      if (currentOrder.stageIndex === 2) {
+        showToast(`🎉 ORDER READY! Please collect at ${currentOrder.pickupLocation}`, 'success');
+      } else {
+        showToast(`Order status updated to: stage ${currentOrder.stageIndex + 1}`);
+      }
+    }
+
+    function dismissCompletedOrder() {
+      currentOrder = null;
+      renderTrackerView();
+      showToast('Order completed and cleared from tracker.');
+    }
+
+    function playChime() {
+      try {
+        if (window.Tone) {
+          Tone.start();
+          const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+          synth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+        }
+      } catch (err) {
+        console.warn("Audio chime prevented by browser policy", err);
+      }
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `px-4 py-3 rounded-2xl shadow-xl text-xs font-bold transition-all duration-300 transform translate-y-4 opacity-0 pointer-events-auto flex items-center gap-2 border ${
+        type === 'success' 
+          ? 'bg-emerald-900 text-emerald-100 border-emerald-700' 
+          : 'bg-slate-900 text-white border-slate-700'
+      }`;
+      toast.innerHTML = `
+        <i data-lucide="${type === 'success' ? 'check-circle' : 'info'}" class="w-4 h-4 text-orange-400 shrink-0"></i>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      // Trigger animation
+      setTimeout(() => {
+        toast.classList.remove('translate-y-4', 'opacity-0');
+      }, 50);
+
+      // Auto dismiss
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-x-4');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function escapeQuotes(str) {
+      return str.replace(/'/g, "\\'");
+    }
+  </script>
+</body>
+</html>
